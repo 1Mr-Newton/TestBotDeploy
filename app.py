@@ -31,7 +31,6 @@ async def progress_callback(current, total, chat_id, msg_id):
 
 @client.on(events.NewMessage)
 async def handler(event):
-    print('something')
     user = event.sender_id
     text = event.raw_text
 
