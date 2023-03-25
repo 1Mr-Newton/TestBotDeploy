@@ -45,6 +45,7 @@ async def handler(event):
         url = text
         filename = str(uuid4())+'.mp4'
         msg = await event.respond('Processing...')
+        # await msg.edit('Processed')
         download(filename=filename, url=url)
         start_time = time.time()
         file = await fast_upload(
@@ -53,6 +54,7 @@ async def handler(event):
             # progress_bar_function=lambda current, total: progress_callback(
             # current, total, event.chat_id, msg.id),
         )
+        await msg.edit('Uploaded... 100%')
         print("--- %s seconds ---" % (time.time() - start_time))
 
         await client.send_file(
