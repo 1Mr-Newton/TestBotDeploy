@@ -1,9 +1,13 @@
+from dotenv import load_dotenv
 from telethon import TelegramClient, events
 import os
 import requests
 from tqdm import tqdm
 from uuid import uuid4
-from dotenv import load_dotenv
+import cryptg
+import time
+from FastTelethonhelper import fast_download, fast_upload, upload_file
+
 load_dotenv()
 
 api_id = os.getenv('api_id')
@@ -37,6 +41,12 @@ async def handler(event):
         filename = str(uuid4())+'.mp4'
         msg = await event.respond('Processing...')
         download(filename=filename, url=url)
+        start_time = time.time()
+        f = await fast_upload(client, filename, lambda current, total: progress_callback(
+            current, total, event.chat_id, msg.id),
+        )
+        print("--- %s seconds ---" % (time.time() - start_time))
+        secondtme = time.time()
         file = await client.upload_file(
             file=filename,
             progress_callback=lambda current, total: progress_callback(
@@ -45,6 +55,7 @@ async def handler(event):
 
 
         )
+        print("--- %s seconds ---" % (time.time() - secondtme))
         await client.send_file(
             user, file,
             progress_callback=lambda current, total: progress_callback(
