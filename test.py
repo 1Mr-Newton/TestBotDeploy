@@ -37,8 +37,21 @@ async def handler(event):
         url = k[-1]
         msg = await event.respond('Processing...')
         download(filename=filename, url=url)
-        await client.send_file(user, filename, progress_callback=lambda current, total: progress_callback(
-            current, total, event.chat_id, msg.id))
+        file = await client.upload_file(
+            file=filename,
+            progress_callback=lambda current, total: progress_callback(
+                current, total, event.chat_id, msg.id),
+            part_size_kb=512,
+
+
+        )
+        await client.send_file(
+            user, file,
+            progress_callback=lambda current, total: progress_callback(
+                current, total, event.chat_id, msg.id),
+            force_document=True,
+
+        )
         print('done uploading')
 
 
