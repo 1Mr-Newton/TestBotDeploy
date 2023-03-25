@@ -34,7 +34,7 @@ async def handler(event):
 
     if 'http' in text:
         url = text
-        filename = uuid4()+'.mp4'
+        filename = str(uuid4())+'.mp4'
         msg = await event.respond('Processing...')
         download(filename=filename, url=url)
         file = await client.upload_file(
