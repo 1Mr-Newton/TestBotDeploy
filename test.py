@@ -2,6 +2,7 @@ from telethon import TelegramClient, events
 import os
 import requests
 from tqdm import tqdm
+from uuid import uuid4
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -31,10 +32,9 @@ async def handler(event):
     user = event.sender_id
     text = event.raw_text
 
-    if '/upload' in text:
-        k = text.split("\n")
-        filename = k[1]
-        url = k[-1]
+    if 'http' in text:
+        url = text
+        filename = uuid4()+'.mp4'
         msg = await event.respond('Processing...')
         download(filename=filename, url=url)
         file = await client.upload_file(
