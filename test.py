@@ -6,7 +6,7 @@ from tqdm import tqdm
 from uuid import uuid4
 import cryptg
 import time
-from FastTelethonhelper import fast_download, fast_upload, upload_file
+from FastTelethonhelper import fast_upload
 
 load_dotenv()
 
@@ -31,6 +31,11 @@ async def progress_callback(current, total, chat_id, msg_id):
     await client.edit_message(chat_id, msg_id, new_message)
 
 
+async def progress(current, total):
+    progress = f'{round(current / total * 100, 1)}%'
+    print(progress)
+
+
 @client.on(events.NewMessage)
 async def handler(event):
     user = event.sender_id
@@ -42,28 +47,22 @@ async def handler(event):
         msg = await event.respond('Processing...')
         download(filename=filename, url=url)
         start_time = time.time()
-        f = await fast_upload(client, filename, lambda current, total: progress_callback(
-            current, total, event.chat_id, msg.id),
+        file = await fast_upload(
+            client, filename,
+            progress_bar_function=lambda current, total: progress_callback(
+                current, total, event.chat_id, msg.id),
         )
         print("--- %s seconds ---" % (time.time() - start_time))
-        secondtme = time.time()
-        file = await client.upload_file(
-            file=filename,
-            progress_callback=lambda current, total: progress_callback(
-                current, total, event.chat_id, msg.id),
-            part_size_kb=512,
 
-
-        )
-        print("--- %s seconds ---" % (time.time() - secondtme))
         await client.send_file(
             user, file,
-            progress_callback=lambda current, total: progress_callback(
-                current, total, event.chat_id, msg.id),
             force_document=True,
+            # progress_callback=lambda current, total: progress_callback(
+            # current, total, event.chat_id, msg.id),
 
         )
-        print('done uploading')
+        if os.path.exists(filename):
+            os.remove(filename)
 
 
 def download(url, filename):
