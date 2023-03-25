@@ -49,8 +49,9 @@ async def handler(event):
         start_time = time.time()
         file = await fast_upload(
             client, filename,
-            progress_bar_function=lambda current, total: progress_callback(
-                current, total, event.chat_id, msg.id),
+            reply=msg,
+            # progress_bar_function=lambda current, total: progress_callback(
+            # current, total, event.chat_id, msg.id),
         )
         print("--- %s seconds ---" % (time.time() - start_time))
 
